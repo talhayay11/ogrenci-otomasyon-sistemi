@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OgrenciOtomasyon.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d97716c2cdd69eb24e2d91ea5d4d33447505b207")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51cd1f2441cc5312e76e3a59b8067f157c853109")]
 [assembly: System.Reflection.AssemblyProductAttribute("OgrenciOtomasyon.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OgrenciOtomasyon.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

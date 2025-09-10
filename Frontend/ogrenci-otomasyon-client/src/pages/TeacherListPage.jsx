@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchTeachers, createTeacher, updateTeacher } from '../services/teacherService';
+import { fetchTeachers, createTeacher, updateTeacher, deleteTeacher } from '../services/teacherService';
 import { resetPassword } from '../services/adminService';
 
 export default function TeacherListPage() {
@@ -27,6 +27,18 @@ export default function TeacherListPage() {
     alert('Şifre güncellendi.');
   };
 
+  const handleDeleteTeacher = async (teacherId) => {
+    if (!window.confirm('Bu öğretmeni silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    try {
+      await deleteTeacher(teacherId);
+      await load();
+    } catch (err) {
+      alert('Öğretmen silinemedi.');
+    }
+  };
+
   return (
     <div style={{ padding: 24 }}>
       <h2>Öğretmenler</h2>
@@ -37,9 +49,23 @@ export default function TeacherListPage() {
       </form>
       <ul className="card" style={{ marginTop: 12 }}>
         {teachers.map(t => (
-          <li key={t.id}>
-            {(t.firstName || '').replace(/\s*\(Güncel\)$/,'')} {(t.lastName || '').replace(/\s*\(Güncel\)$/,'')}
+          <li key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <span>{(t.firstName || '').replace(/\s*\(Güncel\)$/,'')} {(t.lastName || '').replace(/\s*\(Güncel\)$/,'')}</span>
             <button onClick={() => onResetPassword(t)} style={{ marginLeft: 8 }}>Şifre Sıfırla</button>
+            <button 
+              onClick={() => handleDeleteTeacher(t.id)}
+              style={{ 
+                marginLeft: 'auto', 
+                backgroundColor: '#dc3545', 
+                color: 'white', 
+                border: 'none', 
+                padding: '4px 8px', 
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Sil
+            </button>
           </li>
         ))}
       </ul>

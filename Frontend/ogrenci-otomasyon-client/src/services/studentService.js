@@ -5,5 +5,6 @@ export const fetchStudents = () => axios.get(`${API_BASE}/students`);
 export const fetchStudent = (id) => axios.get(`${API_BASE}/students/${id}`);
 export const createStudent = (payload) => axios.post(`${API_BASE}/students`, payload);
 export const updateStudent = (id, payload) => axios.put(`${API_BASE}/students/${id}`, payload);
+export const deleteStudent = (id) => axios.delete(`${API_BASE}/students/${id}`);
 
 

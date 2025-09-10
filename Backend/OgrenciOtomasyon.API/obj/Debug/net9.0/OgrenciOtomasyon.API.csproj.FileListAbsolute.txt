@@ -208,3 +208,4 @@ C:\Users\talha\Documents\GitHub\ogrenci-otomasyon-sistemi\Backend\OgrenciOtomasy
 C:\Users\talha\Documents\GitHub\ogrenci-otomasyon-sistemi\Backend\OgrenciOtomasyon.API\obj\Debug\net9.0\OgrenciOtomasyon.API.pdb
 C:\Users\talha\Documents\GitHub\ogrenci-otomasyon-sistemi\Backend\OgrenciOtomasyon.API\obj\Debug\net9.0\OgrenciOtomasyon.API.genruntimeconfig.cache
 C:\Users\talha\Documents\GitHub\ogrenci-otomasyon-sistemi\Backend\OgrenciOtomasyon.API\obj\Debug\net9.0\ref\OgrenciOtomasyon.API.dll
+C:\Users\talha\Documents\GitHub\ogrenci-otomasyon-sistemi\Backend\OgrenciOtomasyon.API\bin\Debug\net9.0\appsettings.Production.json

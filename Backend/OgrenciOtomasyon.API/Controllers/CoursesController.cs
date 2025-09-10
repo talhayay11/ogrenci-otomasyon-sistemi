@@ -140,6 +140,18 @@ public class CoursesController : ControllerBase
         await _db.SaveChangesAsync();
         return NoContent();
     }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var course = await _db.Courses.FindAsync(id);
+        if (course is null) return NotFound();
+        
+        _db.Courses.Remove(course);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
 }
 
 

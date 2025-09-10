@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchCourses, createCourse } from '../services/courseService';
+import { fetchCourses, createCourse, deleteCourse } from '../services/courseService';
 import { fetchMyCourses, fetchMyEnrollments } from '../services/courseService';
 import { fetchTeachers } from '../services/teacherService';
 import { isAdmin, isTeacher } from '../services/authService';
@@ -59,6 +59,18 @@ export default function CourseListPage() {
     }
   };
 
+  const handleDeleteCourse = async (courseId) => {
+    if (!window.confirm('Bu dersi silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    try {
+      await deleteCourse(courseId);
+      await load(tab);
+    } catch (err) {
+      setError('Ders silinemedi.');
+    }
+  };
+
   const showAllTab = isAdmin();
   const showMineTab = isTeacher();
   const canCreate = isAdmin();
@@ -100,7 +112,7 @@ export default function CourseListPage() {
       </div>
       <ul>
         {courses.map(c => (
-          <li key={c.id}>
+          <li key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Link to={`/courses/${c.id}`}>{c.courseName} ({c.courseCode})</Link>
             <span style={{ marginLeft: 8 }}>
               [Öğretmen: {c.teacher ? `${c.teacher.firstName} ${c.teacher.lastName}` : 'atanmadı'}]
@@ -108,6 +120,22 @@ export default function CourseListPage() {
             <span style={{ marginLeft: 8 }}>
               [Durum: {statusLabel(c.status)}]
             </span>
+            {isAdmin() && tab === 'all' && (
+              <button 
+                onClick={() => handleDeleteCourse(c.id)}
+                style={{ 
+                  marginLeft: 'auto', 
+                  backgroundColor: '#dc3545', 
+                  color: 'white', 
+                  border: 'none', 
+                  padding: '4px 8px', 
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Sil
+              </button>
+            )}
           </li>
         ))}
       </ul>
