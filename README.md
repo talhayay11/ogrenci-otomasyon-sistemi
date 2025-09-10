@@ -49,6 +49,8 @@ Admin, aşağıdaki endpoint ile kullanıcıların şifresini sıfırlayabilir:
 POST /api/admin/reset-password
 Body: { "email": "user@example.com", "newPassword": "NewPass123!*" }
 ```
+ogrenci@test.com
+Ogrenci123!*
 
 ## Frontend (React) Kurulum
 
