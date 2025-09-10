@@ -50,6 +50,20 @@ public class CoursesController : ControllerBase
         return Ok(courses);
     }
 
+    [HttpGet("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> GetById([FromRoute] int id)
+    {
+        var course = await _db.Courses
+            .Include(c => c.Teacher)
+            .Include(c => c.Students)
+            .Include(c => c.Grades)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id);
+        if (course is null) return NotFound();
+        return Ok(course);
+    }
+
     [HttpGet("my-enrollments")]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> GetMyEnrollments()
@@ -76,7 +90,7 @@ public class CoursesController : ControllerBase
     }
 
     [HttpPost("{courseId:int}/students/{studentId:int}")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> AddStudent([FromRoute] int courseId, [FromRoute] int studentId)
     {
         var course = await _db.Courses.Include(c => c.Students).FirstOrDefaultAsync(c => c.Id == courseId);
@@ -91,7 +105,7 @@ public class CoursesController : ControllerBase
     }
 
     [HttpDelete("{courseId:int}/students/{studentId:int}")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> RemoveStudent([FromRoute] int courseId, [FromRoute] int studentId)
     {
         var course = await _db.Courses.Include(c => c.Students).FirstOrDefaultAsync(c => c.Id == courseId);
@@ -117,7 +131,7 @@ public class CoursesController : ControllerBase
     }
 
     [HttpPut("{courseId:int}/status")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> UpdateStatus([FromRoute] int courseId, [FromBody] string status)
     {
         var course = await _db.Courses.FindAsync(courseId);

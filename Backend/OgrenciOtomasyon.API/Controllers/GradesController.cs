@@ -14,14 +14,19 @@ public class GradesController : ControllerBase
     public GradesController(ApplicationDbContext db) { _db = db; }
 
     [HttpPost]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> Create([FromBody] Grade grade)
     {
-        var exists = await _db.Grades.AnyAsync(g => g.StudentId == grade.StudentId && g.CourseId == grade.CourseId);
-        if (exists) return Conflict("Grade already exists for this student and course.");
+        var existing = await _db.Grades.FirstOrDefaultAsync(g => g.StudentId == grade.StudentId && g.CourseId == grade.CourseId);
+        if (existing != null)
+        {
+            existing.Score = grade.Score;
+            await _db.SaveChangesAsync();
+            return Ok(existing);
+        }
         _db.Grades.Add(grade);
         await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetMyGrades), new { }, grade);
+        return Ok(grade);
     }
 
     [HttpGet("my-grades")]

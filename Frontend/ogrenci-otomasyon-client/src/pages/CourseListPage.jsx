@@ -63,6 +63,16 @@ export default function CourseListPage() {
   const showMineTab = isTeacher();
   const canCreate = isAdmin();
 
+  const statusLabel = (s) => {
+    switch ((s || '').toLowerCase()) {
+      case 'ongoing': return 'Ders Başladı';
+      case 'finished': return 'Ders Bitti';
+      case 'cancelled': return 'Ders İptal';
+      case 'planned':
+      default: return 'Ders Planlandı';
+    }
+  };
+
   return (
     <div style={{ padding: 24 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -94,6 +104,9 @@ export default function CourseListPage() {
             <Link to={`/courses/${c.id}`}>{c.courseName} ({c.courseCode})</Link>
             <span style={{ marginLeft: 8 }}>
               [Öğretmen: {c.teacher ? `${c.teacher.firstName} ${c.teacher.lastName}` : 'atanmadı'}]
+            </span>
+            <span style={{ marginLeft: 8 }}>
+              [Durum: {statusLabel(c.status)}]
             </span>
           </li>
         ))}

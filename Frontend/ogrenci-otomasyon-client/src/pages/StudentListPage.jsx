@@ -41,12 +41,15 @@ export default function StudentListPage() {
         <button type="submit">Ekle</button>
       </form>
       <ul className="card" style={{ marginTop: 12 }}>
-        {students.map(s => (
-          <li key={s.id}>
-            {s.firstName} {s.lastName} ({s.studentNumber})
-            <button onClick={() => onResetPassword(s)} style={{ marginLeft: 8 }}>Şifre Sıfırla</button>
-          </li>
-        ))}
+        {students.map(s => {
+          const clean = (t) => (t || '').replace(/\s*\(Güncel\)\s*/gi, '').trim();
+          return (
+            <li key={s.id}>
+              {clean(s.firstName)} {clean(s.lastName)} ({s.studentNumber})
+              <button onClick={() => onResetPassword(s)} style={{ marginLeft: 8 }}>Şifre Sıfırla</button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

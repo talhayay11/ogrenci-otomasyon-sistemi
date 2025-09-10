@@ -45,7 +45,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPost("{id:int}/comments")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> AddComment([FromRoute] int id, [FromBody] string comment)
     {
         var student = await _db.Students.FindAsync(id);

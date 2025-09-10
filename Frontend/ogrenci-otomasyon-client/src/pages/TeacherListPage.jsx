@@ -38,7 +38,7 @@ export default function TeacherListPage() {
       <ul className="card" style={{ marginTop: 12 }}>
         {teachers.map(t => (
           <li key={t.id}>
-            {t.firstName} {t.lastName}
+            {(t.firstName || '').replace(/\s*\(Güncel\)$/,'')} {(t.lastName || '').replace(/\s*\(Güncel\)$/,'')}
             <button onClick={() => onResetPassword(t)} style={{ marginLeft: 8 }}>Şifre Sıfırla</button>
           </li>
         ))}

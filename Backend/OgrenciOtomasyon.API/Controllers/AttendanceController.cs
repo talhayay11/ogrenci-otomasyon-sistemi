@@ -15,7 +15,7 @@ public class AttendanceController : ControllerBase
     public AttendanceController(ApplicationDbContext db) { _db = db; }
 
     [HttpPost]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> Mark([FromBody] Attendance attendance)
     {
         // expects Date, IsPresent, StudentId, CourseId
