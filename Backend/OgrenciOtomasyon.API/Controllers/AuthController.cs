@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OgrenciOtomasyon.API.Services;
+using OgrenciOtomasyon.API.Data;
+using OgrenciOtomasyon.API.Models;
 
 namespace OgrenciOtomasyon.API.Controllers;
 
@@ -13,13 +15,16 @@ public class AuthController : ControllerBase
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly JwtTokenService _jwtTokenService;
 
+    private readonly ApplicationDbContext _db;
     public AuthController(UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager,
-        JwtTokenService jwtTokenService)
+        JwtTokenService jwtTokenService,
+        ApplicationDbContext db)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
+        _db = db;
     }
 
     public record RegisterRequest(string Email, string Password, string Role);
@@ -39,6 +44,16 @@ public class AuthController : ControllerBase
         if (!string.IsNullOrWhiteSpace(request.Role))
         {
             await _userManager.AddToRoleAsync(user, request.Role);
+            if (request.Role == "Student")
+            {
+                _db.Students.Add(new Student { UserId = user.Id, FirstName = request.Email, LastName = "", StudentNumber = DateTime.UtcNow.Ticks.ToString() });
+                await _db.SaveChangesAsync();
+            }
+            else if (request.Role == "Teacher")
+            {
+                _db.Teachers.Add(new Teacher { UserId = user.Id, FirstName = request.Email, LastName = "" });
+                await _db.SaveChangesAsync();
+            }
         }
 
         return Ok();

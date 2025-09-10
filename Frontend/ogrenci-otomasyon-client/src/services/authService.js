@@ -9,6 +9,7 @@ export const setAuthToken = (token) => {
   } else {
     delete axios.defaults.headers.common['Authorization'];
     localStorage.removeItem('token');
+    localStorage.removeItem('roles');
   }
 };
 
@@ -22,10 +23,28 @@ export const login = async (email, password) => {
   // console.debug('API_BASE', API_BASE);
   const { data } = await axios.post(`${API_BASE}/auth/login`, { email, password });
   setAuthToken(data.token);
+  try {
+    const payload = JSON.parse(atob(data.token.split('.')[1]));
+    const roles = payload['role']
+      ? (Array.isArray(payload['role']) ? payload['role'] : [payload['role']])
+      : (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+          ? (Array.isArray(payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'])
+              ? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+              : [payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']])
+          : []);
+    localStorage.setItem('roles', JSON.stringify(roles));
+  } catch {}
   return data;
 };
 
 export const logout = () => setAuthToken(null);
+
+export const getRoles = () => {
+  try { return JSON.parse(localStorage.getItem('roles') || '[]'); } catch { return []; }
+};
+export const isAdmin = () => getRoles().includes('Admin');
+export const isTeacher = () => getRoles().includes('Teacher');
+export const isStudent = () => getRoles().includes('Student');
 
 
 

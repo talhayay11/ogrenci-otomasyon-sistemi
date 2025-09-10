@@ -41,6 +41,26 @@ public static class IdentitySeed
                     }
                 }
 
+                // Seed a temp teacher
+                var teacherEmail = "teacher@test.com";
+                var teacherUser = await userManager.Users.FirstOrDefaultAsync(u => u.Email == teacherEmail);
+                if (teacherUser is null)
+                {
+                    teacherUser = new IdentityUser { UserName = teacherEmail, Email = teacherEmail, EmailConfirmed = true };
+                    var createT = await userManager.CreateAsync(teacherUser, "Teacher123!*");
+                    if (createT.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(teacherUser, "Teacher");
+                    }
+                }
+                // Ensure domain Teacher exists for temp teacher
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                if (!await db.Teachers.AnyAsync(t => t.UserId == teacherUser.Id))
+                {
+                    db.Teachers.Add(new Models.Teacher { UserId = teacherUser.Id, FirstName = "Temp", LastName = "Teacher" });
+                    await db.SaveChangesAsync();
+                }
+
                 break; // success
             }
             catch

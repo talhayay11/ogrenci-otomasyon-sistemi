@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
+    public DbSet<StudentComment> StudentComments => Set<StudentComment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -41,6 +42,14 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<Attendance>()
             .HasIndex(a => new { a.StudentId, a.CourseId, a.Date })
             .IsUnique();
+
+        builder.Entity<Student>()
+            .HasIndex(s => s.UserId)
+            .IsUnique(false);
+
+        builder.Entity<Teacher>()
+            .HasIndex(t => t.UserId)
+            .IsUnique(false);
     }
 }
 

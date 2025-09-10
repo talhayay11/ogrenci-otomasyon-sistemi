@@ -40,6 +40,16 @@ Uygulama başlangıcında "Admin", "Teacher", "Student" rolleri oluşturulur ve 
 - Email: admin@test.com
 - Şifre: Admin123!*
 
+Ek olarak geçici öğretmen kullanıcı eklenir:
+- Email: teacher@test.com
+- Şifre: Teacher123!*
+
+Admin, aşağıdaki endpoint ile kullanıcıların şifresini sıfırlayabilir:
+```
+POST /api/admin/reset-password
+Body: { "email": "user@example.com", "newPassword": "NewPass123!*" }
+```
+
 ## Frontend (React) Kurulum
 
 Önkoşullar: Node.js 18+

@@ -5,6 +5,7 @@ public class Course
     public int Id { get; set; }
     public string CourseName { get; set; } = string.Empty;
     public string CourseCode { get; set; } = string.Empty;
+    public string Status { get; set; } = "Planned"; // Planned, Ongoing, Finished
 
     public int TeacherId { get; set; }
     public Teacher? Teacher { get; set; }

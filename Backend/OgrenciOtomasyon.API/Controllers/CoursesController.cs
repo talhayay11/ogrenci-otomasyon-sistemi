@@ -14,13 +14,32 @@ public class CoursesController : ControllerBase
     private readonly ApplicationDbContext _db;
     public CoursesController(ApplicationDbContext db) { _db = db; }
 
+    public class CreateCourseRequest
+    {
+        public string CourseName { get; set; } = string.Empty;
+        public string CourseCode { get; set; } = string.Empty;
+        public int TeacherId { get; set; }
+    }
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create([FromBody] Course course)
+    public async Task<IActionResult> Create([FromBody] CreateCourseRequest request)
     {
+        var teacher = await _db.Teachers.FindAsync(request.TeacherId);
+        if (teacher is null)
+        {
+            return BadRequest("Geçerli bir öğretmen seçiniz.");
+        }
+        var course = new Course
+        {
+            CourseName = request.CourseName,
+            CourseCode = request.CourseCode,
+            TeacherId = request.TeacherId,
+            Status = "Planned"
+        };
         _db.Courses.Add(course);
         await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAll), new { id = course.Id }, course);
+        return Ok(course);
     }
 
     [HttpGet]
@@ -31,13 +50,28 @@ public class CoursesController : ControllerBase
         return Ok(courses);
     }
 
+    [HttpGet("my-enrollments")]
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> GetMyEnrollments()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var student = await _db.Students.Include(s => s.Courses)
+            .ThenInclude(c => c.Teacher)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+        var list = student?.Courses?.ToList() ?? new List<Course>();
+        return Ok(list);
+    }
+
     [HttpGet("my-courses")]
     [Authorize(Roles = "Teacher")]
     public async Task<IActionResult> GetMyCourses()
     {
-        var teacherIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        // In a real app, we'd map Identity user to Teacher; here we return all for demo
-        var courses = await _db.Courses.Include(c => c.Students).AsNoTracking().ToListAsync();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var teacher = await _db.Teachers.AsNoTracking().FirstOrDefaultAsync(t => t.UserId == userId);
+        var courses = await _db.Courses.Include(c => c.Students)
+            .Where(c => teacher != null ? c.TeacherId == teacher.Id : false)
+            .AsNoTracking().ToListAsync();
         return Ok(courses);
     }
 
@@ -65,6 +99,30 @@ public class CoursesController : ControllerBase
         var student = course.Students.FirstOrDefault(s => s.Id == studentId);
         if (student is null) return NotFound();
         course.Students.Remove(student);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("{courseId:int}/assign-teacher/{teacherId:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AssignTeacher([FromRoute] int courseId, [FromRoute] int teacherId)
+    {
+        var course = await _db.Courses.FindAsync(courseId);
+        if (course is null) return NotFound();
+        var teacherExists = await _db.Teachers.AnyAsync(t => t.Id == teacherId);
+        if (!teacherExists) return NotFound("Teacher not found");
+        course.TeacherId = teacherId;
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("{courseId:int}/status")]
+    [Authorize(Roles = "Teacher")]
+    public async Task<IActionResult> UpdateStatus([FromRoute] int courseId, [FromBody] string status)
+    {
+        var course = await _db.Courses.FindAsync(courseId);
+        if (course is null) return NotFound();
+        course.Status = status;
         await _db.SaveChangesAsync();
         return NoContent();
     }

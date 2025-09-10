@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -15,60 +15,34 @@ const PrivateRoute = ({ children }) => {
 };
 
 export default function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/students"
-          element={
-            <PrivateRoute>
-              <StudentListPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/teachers"
-          element={
-            <PrivateRoute>
-              <TeacherListPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/courses"
-          element={
-            <PrivateRoute>
-              <CourseListPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/courses/:id"
-          element={
-            <PrivateRoute>
-              <CourseDetailPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-grades"
-          element={
-            <PrivateRoute>
-              <MyGradesPage />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
+      <div className="app-shell">
+        <header className="app-header">
+          <div className="brand">Öğrenci Otomasyon Sistemi</div>
+          <button className="theme-toggle" onClick={toggleTheme}>{theme === 'light' ? '🌙' : '☀️'}</button>
+        </header>
+        <main className="app-main">
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+            <Route path="/students" element={<PrivateRoute><StudentListPage /></PrivateRoute>} />
+            <Route path="/teachers" element={<PrivateRoute><TeacherListPage /></PrivateRoute>} />
+            <Route path="/courses" element={<PrivateRoute><CourseListPage /></PrivateRoute>} />
+            <Route path="/courses/:id" element={<PrivateRoute><CourseDetailPage /></PrivateRoute>} />
+            <Route path="/my-grades" element={<PrivateRoute><MyGradesPage /></PrivateRoute>} />
+          </Routes>
+        </main>
+        <footer className="app-footer">© {new Date().getFullYear()}</footer>
+      </div>
     </BrowserRouter>
   );
 }
